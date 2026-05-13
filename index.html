@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="配当台帳">
+<title>配当台帳 — Dividend Ledger</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1a1a; --paper:#f5f1e8; --paper-dark:#ebe5d4;
+    --rule:#2c2c2c; --muted:#6b6357;
+    --vermillion:#c8433a; --vermillion-soft:#e8a89e;
+    --green:#4a7c59; --gold:#b8944a;
+    --line:rgba(26,26,26,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink);font-family:'Shippori Mincho',serif;min-height:100vh}
+  body{
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(200,67,58,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(184,148,74,0.05) 0%, transparent 50%);
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .container{max-width:1400px;margin:0 auto;padding:48px 56px}
+
+  header{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:24px;border-bottom:1px solid var(--rule);margin-bottom:24px;flex-wrap:wrap;gap:16px}
+  .brand{display:flex;align-items:baseline;gap:20px}
+  .brand-mark{width:44px;height:44px;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;writing-mode:vertical-rl;letter-spacing:-2px}
+  h1{font-size:28px;font-weight:500;letter-spacing:0.02em}
+  .brand-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px}
+  .header-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:right;letter-spacing:0.1em}
+  .header-meta .date{font-size:13px;color:var(--ink);margin-bottom:4px}
+  #install-btn{display:none;margin-top:8px}
+
+  .status-bar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 16px;background:var(--paper-dark);border:1px solid var(--rule);
+    margin-bottom:24px;font-size:12px;flex-wrap:wrap;gap:12px;
+  }
+  .status-bar > div{display:flex;align-items:center;gap:8px}
+  .status-bar small{font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:0.05em}
+
+  nav.tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  .tab{background:none;border:none;font-family:'Shippori Mincho',serif;font-size:15px;padding:14px 24px;cursor:pointer;color:var(--muted);position:relative;transition:color 0.2s;letter-spacing:0.05em;white-space:nowrap}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--ink)}
+  .tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--vermillion)}
+  .tab-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-right:8px}
+
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:40px;border:1px solid var(--rule)}
+  .sum-card{padding:24px 28px;border-right:1px solid var(--line);position:relative}
+  .sum-card:last-child{border-right:none}
+  .sum-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px}
+  .sum-value{font-size:28px;font-weight:500;letter-spacing:-0.01em}
+  .sum-value .unit{font-size:14px;color:var(--muted);margin-left:4px;font-weight:400}
+  .sum-delta{font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:6px}
+  .positive{color:var(--green)}
+  .negative{color:var(--vermillion)}
+
+  .panel{background:rgba(255,255,255,0.4);border:1px solid var(--rule);margin-bottom:24px}
+  .panel-header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line);background:var(--paper-dark);flex-wrap:wrap;gap:8px}
+  .panel-title{font-size:16px;font-weight:500;letter-spacing:0.05em}
+  .panel-title::before{content:'—';color:var(--vermillion);margin-right:10px}
+  .panel-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+  .btn{font-family:'Shippori Mincho',serif;font-size:13px;padding:8px 16px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);cursor:pointer;transition:all 0.2s;letter-spacing:0.05em}
+  .btn:hover{background:var(--ink);color:var(--paper)}
+  .btn-primary{background:var(--ink);color:var(--paper)}
+  .btn-primary:hover{background:var(--vermillion);border-color:var(--vermillion)}
+  .btn-sm{font-size:11px;padding:6px 12px}
+  .btn-danger{color:var(--vermillion);border-color:var(--vermillion)}
+  .btn-danger:hover{background:var(--vermillion);color:var(--paper)}
+
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:800px}
+  th{text-align:left;padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;font-weight:500;border-bottom:1px solid var(--line)}
+  th.num, td.num{text-align:right;font-family:'JetBrains Mono',monospace}
+  td{padding:16px 20px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr.row:hover{background:rgba(200,67,58,0.03)}
+  .ticker{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);margin-right:8px}
+  .company{font-weight:500}
+  .fav{color:var(--gold);cursor:pointer;font-size:16px;margin-right:6px}
+  .fav.off{color:var(--line)}
+
+  .form-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:20px 24px;background:var(--paper-dark)}
+  .form-field{display:flex;flex-direction:column;gap:4px}
+  .form-field.span-2{grid-column:span 2}
+  .form-field label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase}
+  .form-field input, .form-field select{font-family:'Shippori Mincho',serif;font-size:14px;padding:8px 10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+  .form-field input:focus, .form-field select:focus{outline:none;border-color:var(--vermillion)}
+
+  .alert-list{padding:0}
+  .alert-item{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:16px;padding:14px 24px;border-bottom:1px solid var(--line);align-items:center}
+  .alert-item:last-child{border-bottom:none}
+  .alert-badge{display:inline-block;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em}
+  .badge-above{background:var(--green);color:var(--paper)}
+  .badge-below{background:var(--vermillion);color:var(--paper)}
+  .badge-triggered{background:var(--gold);color:var(--paper)}
+
+  .csv-drop{border:2px dashed var(--line);padding:40px;text-align:center;margin:20px 24px;transition:all 0.2s;cursor:pointer}
+  .csv-drop:hover, .csv-drop.drag{border-color:var(--vermillion);background:rgba(200,67,58,0.02)}
+  .csv-drop-icon{font-size:32px;color:var(--muted);margin-bottom:8px}
+  .csv-drop-text{font-size:14px;color:var(--muted)}
+  .csv-drop small{font-family:'JetBrains Mono',monospace;font-size:10px;display:block;margin-top:8px;letter-spacing:0.1em}
+
+  .broker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .broker-card{padding:20px 24px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .broker-card:nth-child(3n){border-right:none}
+  .broker-card:nth-last-child(-n+3){border-bottom:none}
+  .broker-name{font-size:15px;font-weight:500}
+  .broker-url{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px}
+
+  .tab-panel{display:none;animation:fadeIn 0.3s ease}
+  .tab-panel.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--paper);padding:16px 24px;border-left:3px solid var(--vermillion);font-size:14px;max-width:360px;box-shadow:0 10px 40px rgba(0,0,0,0.2);transform:translateX(420px);transition:transform 0.3s ease;z-index:1000}
+  .toast.show{transform:translateX(0)}
+  .toast-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--vermillion-soft);letter-spacing:0.15em;margin-bottom:6px}
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.1em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  .empty{padding:40px 24px;text-align:center;color:var(--muted);font-size:14px}
+  .pwa-notice{background:var(--paper-dark);border-left:3px solid var(--vermillion);padding:12px 20px;margin-bottom:20px;font-size:13px;color:var(--muted);line-height:1.6}
+  .pwa-notice strong{color:var(--ink)}
+
+  @media (max-width: 900px) {
+    .container{padding:20px 16px}
+    h1{font-size:22px}
+    .summary{grid-template-columns:repeat(2,1fr)}
+    .sum-card{padding:16px 18px;border-bottom:1px solid var(--line)}
+    .sum-card:nth-child(odd){border-right:1px solid var(--line)}
+    .sum-card:nth-child(even){border-right:none}
+    .sum-card:nth-last-child(-n+2){border-bottom:none}
+    .sum-value{font-size:22px}
+    .form-grid{grid-template-columns:repeat(2,1fr)}
+    .form-field.span-2{grid-column:span 2}
+    .broker-grid{grid-template-columns:1fr}
+    .broker-card{border-right:none;border-bottom:1px solid var(--line)}
+    .broker-card:last-child{border-bottom:none}
+    .alert-item{grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px}
+    .tab{padding:14px 14px;font-size:14px}
+    .panel-header{padding:14px 16px}
+    .toast{right:12px;left:12px;bottom:12px;max-width:none;transform:translateY(200px)}
+    .toast.show{transform:translateY(0)}
+    header{align-items:flex-start}
+    .header-meta{text-align:left}
+    .status-bar{flex-direction:column;align-items:flex-start}
+  }
+  @media (max-width: 480px) {
+    .summary{grid-template-columns:1fr}
+    .sum-card{border-right:none !important}
+    .brand{gap:12px}
+    h1{font-size:20px}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">配</div>
+      <div>
+        <h1>配当台帳</h1>
+        <div class="brand-sub">Dividend Ledger · v2.0 · yfinance + Firebase</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="date" id="today"></div>
+      <div>東京証券取引所 · JST</div>
+      <button class="btn btn-sm btn-primary" id="install-btn" onclick="installApp()">アプリをインストール</button>
+    </div>
+  </header>
+
+  <!-- ステータスバー: 同期状態 + 株価更新時刻 -->
+  <div class="status-bar">
+    <div>
+      <small>SYNC</small>
+      <span id="sync-status"><span style="color:var(--muted)">読み込み中...</span></span>
+    </div>
+    <div>
+      <small>PRICE</small>
+      <span id="price-status">読み込み中...</span>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="sum-card">
+      <div class="sum-label">保有評価額 Total Value</div>
+      <div class="sum-value" id="total-value">¥0</div>
+      <div class="sum-delta" id="total-delta">—</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">取得額 Cost Basis</div>
+      <div class="sum-value" id="total-cost">¥0</div>
+      <div class="sum-delta">取得時点</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">年間配当予想 Annual Dividend</div>
+      <div class="sum-value" id="annual-div">¥0</div>
+      <div class="sum-delta" id="yoc">YoC —</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">平均利回り Avg Yield</div>
+      <div class="sum-value" id="avg-yield">—<span class="unit">%</span></div>
+      <div class="sum-delta">現在株価ベース</div>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="portfolio"><span class="tab-num">01</span>ポートフォリオ</button>
+    <button class="tab" data-tab="watchlist"><span class="tab-num">02</span>お気に入り</button>
+    <button class="tab" data-tab="alerts"><span class="tab-num">03</span>通知設定</button>
+    <button class="tab" data-tab="import"><span class="tab-num">04</span>取り込み</button>
+    <button class="tab" data-tab="brokers"><span class="tab-num">05</span>証券会社</button>
+    <button class="tab" data-tab="backup"><span class="tab-num">06</span>バックアップ</button>
+  </nav>
+
+  <div class="tab-panel active" id="tab-portfolio">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">保有銘柄 Holdings</div>
+        <div class="panel-actions">
+          <button class="btn btn-sm" onclick="refreshPrices()">株価更新</button>
+          <button class="btn btn-sm btn-primary" onclick="toggleForm('holding-form')">銘柄を追加</button>
+        </div>
+      </div>
+      <div id="holding-form" style="display:none">
+        <div class="form-grid">
+          <div class="form-field"><label>コード</label><input type="text" id="h-code" placeholder="7203"></div>
+          <div class="form-field span-2"><label>銘柄名</label><input type="text" id="h-name" placeholder="トヨタ自動車"></div>
+          <div class="form-field"><label>株数</label><input type="number" id="h-shares" placeholder="100"></div>
+          <div class="form-field"><label>取得単価</label><input type="number" id="h-cost" placeholder="2500"></div>
+          <div class="form-field"><label>年間配当/株</label><input type="number" id="h-div" placeholder="75"></div>
+        </div>
+        <div style="padding:0 24px 20px;background:var(--paper-dark)">
+          <button class="btn btn-sm btn-primary" onclick="addHolding()">登録</button>
+          <button class="btn btn-sm" onclick="toggleForm('holding-form')">取消</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:30px"></th><th>銘柄</th>
+            <th class="num">株数</th><th class="num">取得単価</th><th class="num">現在株価</th>
+            <th class="num">評価損益</th><th class="num">利回り (YoC)</th><th class="num">現在利回り</th>
+            <th class="num">年間配当</th><th></th>
+          </tr></thead>
+          <tbody id="holdings-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-watchlist">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">お気に入り銘柄 Watchlist</div>
+        <div class="panel-actions">
+          <button class="btn btn-sm btn-primary" onclick="toggleForm('watch-form')">銘柄を追加</button>
+        </div>
+      </div>
+      <div id="watch-form" style="display:none">
+        <div class="form-grid">
+          <div class="form-field"><label>コード</label><input type="text" id="w-code" placeholder="8306"></div>
+          <div class="form-field span-2"><label>銘柄名</label><input type="text" id="w-name" placeholder="三菱UFJ"></div>
+          <div class="form-field span-2"><label>メモ</label><input type="text" id="w-memo" placeholder="決算後に検討"></div>
+        </div>
+        <div style="padding:0 24px 20px;background:var(--paper-dark)">
+          <button class="btn btn-sm btn-primary" onclick="addWatch()">登録</button>
+          <button class="btn btn-sm" onclick="toggleForm('watch-form')">取消</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>銘柄</th><th class="num">現在株価</th><th class="num">前日比</th>
+            <th class="num">配当利回り</th><th class="num">年間配当</th><th>メモ</th><th></th>
+          </tr></thead>
+          <tbody id="watch-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-alerts">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">株価通知設定 Price Alerts</div>
+        <div class="panel-actions">
+          <button class="btn btn-sm" onclick="requestNotifPermission()">通知を許可</button>
+          <button class="btn btn-sm btn-primary" onclick="toggleForm('alert-form')">通知を追加</button>
+        </div>
+      </div>
+      <div id="alert-form" style="display:none">
+        <div class="form-grid">
+          <div class="form-field"><label>コード</label><input type="text" id="a-code" placeholder="7203"></div>
+          <div class="form-field span-2"><label>銘柄名</label><input type="text" id="a-name" placeholder="トヨタ自動車"></div>
+          <div class="form-field"><label>条件</label>
+            <select id="a-cond">
+              <option value="above">以上になったら</option>
+              <option value="below">以下になったら</option>
+            </select>
+          </div>
+          <div class="form-field"><label>閾値 (円)</label><input type="number" id="a-price" placeholder="3000"></div>
+        </div>
+        <div style="padding:0 24px 20px;background:var(--paper-dark)">
+          <button class="btn btn-sm btn-primary" onclick="addAlert()">登録</button>
+          <button class="btn btn-sm" onclick="toggleForm('alert-form')">取消</button>
+        </div>
+      </div>
+      <div class="alert-list" id="alert-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-import">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">CSV取り込み CSV Import</div></div>
+      <div class="csv-drop" id="csv-drop" onclick="document.getElementById('csv-file').click()">
+        <div class="csv-drop-icon">⊕</div>
+        <div class="csv-drop-text">CSVファイルをドロップ、またはクリックして選択</div>
+        <small>FORMAT: code, name, shares, cost, dividend_per_share</small>
+      </div>
+      <input type="file" id="csv-file" accept=".csv" style="display:none">
+      <div style="padding:0 24px 24px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:8px">CSV SAMPLE</div>
+        <pre style="background:var(--paper-dark);padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;overflow-x:auto;border:1px solid var(--line)">code,name,shares,cost,dividend_per_share
+7203,トヨタ自動車,100,2500,75
+8306,三菱UFJフィナンシャル・グループ,500,900,41</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-brokers">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">証券会社リンク Broker Links</div></div>
+      <div class="broker-grid" id="broker-grid"></div>
+      <div style="padding:20px 24px;background:var(--paper-dark);font-size:13px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--ink)">※ 連携方式</strong><br>
+        各証券会社サイトへのリンク + CSVインポートの2方式です。日本の証券会社は個人向け公開APIを提供していないため、口座への直接アクセスはできません。
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-backup">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">データバックアップ Backup & Restore</div></div>
+      <div style="padding:24px">
+        <div class="pwa-notice">
+          <strong>データ保存先</strong><br>
+          Googleログイン中はFirestore（クラウド）に保存され、全端末で自動同期されます。未ログイン時は端末ローカル（IndexedDB）のみ。<br>
+          いずれの場合も、定期的にJSONバックアップを推奨します。
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px">
+          <button class="btn btn-primary" onclick="exportBackup()">データをエクスポート (JSON)</button>
+          <button class="btn" onclick="triggerImport()">バックアップから復元</button>
+          <input type="file" id="backup-file" accept=".json" style="display:none">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>DIVIDEND LEDGER · v2.0</div>
+    <div>株価データ: yfinance (Yahoo Finance) · 約20分遅延</div>
+    <div>投資判断の根拠としないでください</div>
+  </footer>
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title">NOTIFICATION</div>
+  <div id="toast-body"></div>
+</div>
+
+<!-- スクリプト読み込み順序: config → db → firebase-sync (module) → app (module) -->
+<script src="./firebase-config.js"></script>
+<script src="./db.js"></script>
+<script type="module" src="./firebase-sync.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

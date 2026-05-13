@@ -1,0 +1,16 @@
+// Firestore セキュリティルール
+// Firebase Console > Firestore Database > Rules タブにコピー&ペースト
+//
+// このルールにより:
+// - ログイン済みユーザーのみアクセス可能
+// - 自分のuid配下のデータのみ読み書き可能
+// - 他人のデータは見えない
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
