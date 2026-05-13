@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-05-13T23:26:47.118917+09:00",
-  "updatedAtUnix": 1778682407,
+  "updatedAt": "2026-05-14T07:46:36.678696+09:00",
+  "updatedAtUnix": 1778712396,
   "successCount": 10,
   "failedCount": 0,
   "failedCodes": [],
@@ -45,7 +45,7 @@
       "name": "武田薬品工業",
       "price": 5192.0,
       "prev": 5152.0,
-      "div": 200.0
+      "div": 204.0
     },
     "2914": {
       "code": "2914",
