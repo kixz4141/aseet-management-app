@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-08-10T16:52:55.610923+09:00",
-  "updatedAtUnix": 1786348375,
+  "updatedAt": "2026-08-10T22:22:51.553967+09:00",
+  "updatedAtUnix": 1786368171,
   "successCount": 10,
   "failedCount": 0,
   "failedCodes": [],
@@ -59,7 +59,7 @@
       "name": "三菱商事",
       "price": 4849.0,
       "prev": 4855.0,
-      "div": 125.0
+      "div": 110.0
     },
     "7267": {
       "code": "7267",
