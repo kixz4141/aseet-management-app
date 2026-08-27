@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-08-27T17:00:19.417743+09:00",
-  "updatedAtUnix": 1787817619,
+  "updatedAt": "2026-08-27T17:45:35.619570+09:00",
+  "updatedAtUnix": 1787820335,
   "successCount": 10,
   "failedCount": 0,
   "failedCodes": [],
@@ -10,7 +10,7 @@
       "name": "トヨタ自動車",
       "price": 3077.0,
       "prev": 3074.0,
-      "div": 100.0
+      "div": 95.0
     },
     "8306": {
       "code": "8306",
