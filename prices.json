@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-04T20:01:26.309318+09:00",
-  "updatedAtUnix": 1788519686,
+  "updatedAt": "2026-09-05T01:09:31.848133+09:00",
+  "updatedAtUnix": 1788538171,
   "successCount": 10,
   "failedCount": 0,
   "failedCodes": [],
@@ -17,7 +17,7 @@
       "name": "三菱UFJフィナンシャル・グループ",
       "price": 3785.0,
       "prev": 3768.0,
-      "div": 86.0
+      "div": 96.0
     },
     "9432": {
       "code": "9432",
