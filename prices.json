@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-05T01:09:31.848133+09:00",
-  "updatedAtUnix": 1788538171,
+  "updatedAt": "2026-09-05T05:38:22.640285+09:00",
+  "updatedAtUnix": 1788554302,
   "successCount": 10,
   "failedCount": 0,
   "failedCodes": [],
@@ -31,14 +31,14 @@
       "name": "KDDI",
       "price": 2981.0,
       "prev": 2978.5,
-      "div": 80.0
+      "div": 84.0
     },
     "8316": {
       "code": "8316",
       "name": "三井住友フィナンシャルグループ",
       "price": 7083.0,
       "prev": 7108.0,
-      "div": 157.0
+      "div": 135.0
     },
     "4502": {
       "code": "4502",
