@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-10T01:23:13.725398+09:00",
-  "updatedAtUnix": 1788970993,
+  "updatedAt": "2026-09-10T05:48:17.839442+09:00",
+  "updatedAtUnix": 1788986897,
   "successCount": 10,
   "failedCount": 0,
   "failedCodes": [],
@@ -52,7 +52,7 @@
       "name": "日本たばこ産業",
       "price": 6610.0,
       "prev": 6663.0,
-      "div": 272.0
+      "div": 0.0
     },
     "8058": {
       "code": "8058",
