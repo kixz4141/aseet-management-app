@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-11-14T04:28:25.836441+09:00",
-  "updatedAtUnix": 1794598105,
+  "updatedAt": "2026-11-14T14:54:08.033488+09:00",
+  "updatedAtUnix": 1794635648,
   "successCount": 10,
   "failedCount": 0,
   "failedCodes": [],
@@ -38,7 +38,7 @@
       "name": "三井住友フィナンシャルグループ",
       "price": 3275.0,
       "prev": 3298.0,
-      "div": 90.0
+      "div": 100.0
     },
     "4502": {
       "code": "4502",
